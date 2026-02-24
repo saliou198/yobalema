@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-const Form = () => {
+const LoginForm = () => {
   return (
     <StyledWrapper>
       <form className="form">
@@ -26,8 +27,8 @@ const Form = () => {
           <span className="span">Forgot password?</span>
         </div>
         <button className="button-submit">Sign In</button>
-        <p className="p">Don't have an account? <span className="span">Sign Up</span>
-        </p><p className="p line">Or With</p>
+       <p className="p">Don't have an account? <Link to="/signup">Sign Up</Link></p>
+        <p className="p line">Or With</p>
         <div className="flex-row">
           <button className="btn google">
             <svg version="1.1" width={20} id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style={{enableBackground: 'new 0 0 512 512'}} xmlSpace="preserve">
@@ -56,7 +57,10 @@ const Form = () => {
 const StyledWrapper = styled.div`
 justify-content: center;
 display: flex;
-margin-top: 50px;
+margin-top: 3
+
+
+0px;
 
 
   .form {
@@ -178,4 +182,4 @@ margin-top: 50px;
     ;
   }`;
 
-export default Form;
+export default LoginForm;

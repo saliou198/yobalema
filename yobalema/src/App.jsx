@@ -1,7 +1,8 @@
 
 import './App.css';
 import NavBar from './navBar';
-import Form from './loginPage';
+import LoginForm from './loginPage';
+import SignupForm from './signupPage';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -9,11 +10,12 @@ function App() {
 
   return (
     <>
-    
+   
     <BrowserRouter>
-    <NavBar />
+     <NavBar />
       <Routes>
-        <Route path="/login" element={<Form />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/signup" element={<SignupForm />} />
         <Route path="/" element={<div className="home"></div>} />
       </Routes>
     </BrowserRouter>
