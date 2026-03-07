@@ -1,75 +1,82 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
-const LocationInput = ({ label, onSelect }) => {
+const API_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY;
 
-  const [query, setQuery] = useState("");         // ce que l'user tape
-  const [suggestions, setSuggestions] = useState([]); // résultats de l'API
+const LocationAutocomplete = ({ label, value, onSelect, placeholder = 'Entrez une ville ou adresse...' }) => {
+  const [query, setQuery] = useState(value || '');
+  const [suggestions, setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const timerRef = useRef(null);
 
-  const API_KEY = "e9c3966f18484ceeb5c6454a930813fa";
+  useEffect(() => {
+    setQuery(value || '');
+  }, [value]);
 
-  // Cette fonction est appelée à chaque frappe au clavier
-  const handleChange = async (e) => {
-    const value = e.target.value;
-    setQuery(value);
-
-    // On attend au moins 3 caractères avant d'appeler l'API
-    if (value.length < 3) {
+  const fetchSuggestions = async (text) => {
+    if (!API_KEY || text.trim().length < 3) {
       setSuggestions([]);
       return;
     }
-    
+
+    setLoading(true);
+
     try {
-      const response = await fetch(
-        `https://api.geoapify.com/v1/geocode/autocomplete?text=${value}&apiKey=${API_KEY}&lang=fr&limit=5`
-      );
+      const url = new URL('https://api.geoapify.com/v1/geocode/autocomplete');
+      url.searchParams.set('text', text);
+      url.searchParams.set('apiKey', API_KEY);
+      url.searchParams.set('lang', 'fr');
+      url.searchParams.set('limit', '5');
+
+      const response = await fetch(url.toString());
       const data = await response.json();
-
-      // data.features contient le tableau des suggestions
-      setSuggestions(data.features);
+      setSuggestions(data.features || []);
     } catch (error) {
-
-      alert.error("Erreur Geoapify:", error);
-
+      setSuggestions([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Quand l'user clique sur une suggestion
-  const handleSelect = (place) => {
-    const placeName = place.properties.formatted; // adresse complète
-    setQuery(placeName);       // on met l'adresse dans le champ
-    setSuggestions([]);        // on ferme la liste
-    onSelect(place);           // on remonte le lieu choisi au parent
+  const handleChange = (event) => {
+    const next = event.target.value;
+    setQuery(next);
+
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      fetchSuggestions(next);
+    }, 300);
+  };
+
+  const handleSelect = (feature) => {
+    const formatted = feature.properties.formatted;
+    const selected = {
+      name: formatted,
+      lat: feature.properties.lat,
+      lng: feature.properties.lon,
+    };
+
+    setQuery(formatted);
+    setSuggestions([]);
+    onSelect(selected);
   };
 
   return (
-    <div style={{ position: "relative" }}>
-      <label>{label}</label>
-      <input
-        type="text"
-        value={query}
-        onChange={handleChange}
-        placeholder="Entrez une ville ou adresse..."
-      />
+    <div className="position-relative w-100">
+      <label className="form-label mb-1">{label}</label>
+      <input className="form-control" type="text" value={query} onChange={handleChange} placeholder={placeholder} />
 
-      {/* On affiche les suggestions seulement s'il y en a */}
+      {loading && <div className="small text-muted mt-1">Recherche...</div>}
+
       {suggestions.length > 0 && (
-        <ul style={{
-          position: "absolute",
-          background: "white",
-          border: "1px solid #ccc",
-          listStyle: "none",
-          padding: 0,
-          margin: 0,
-          width: "100%",
-          zIndex: 1000
-        }}>
-          {suggestions.map((place) => (
+        <ul className="list-group position-absolute w-100" style={{ zIndex: 20, maxHeight: 260, overflowY: 'auto' }}>
+          {suggestions.map((feature) => (
             <li
-              key={place.properties.place_id}
-              onClick={() => handleSelect(place)}
-              style={{ padding: "8px", cursor: "pointer" }}
+              key={feature.properties.place_id}
+              className="list-group-item list-group-item-action"
+              role="button"
+              onClick={() => handleSelect(feature)}
             >
-              {place.properties.formatted}
+              {feature.properties.formatted}
             </li>
           ))}
         </ul>
@@ -78,4 +85,4 @@ const LocationInput = ({ label, onSelect }) => {
   );
 };
 
-export default LocationInput;
+export default LocationAutocomplete;

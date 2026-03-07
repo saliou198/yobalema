@@ -1,84 +1,56 @@
-import styled from 'styled-components';
 import { useState } from 'react';
-import  LocationInput from './locationAutocomplete.jsx';
+import { useNavigate } from 'react-router-dom';
+import LocationAutocomplete from './locationAutocomplete';
 
-
-
-function TripSearch() {
-
-  const [departure, setDepart] = useState(null);
+function TripSearchForm() {
+  const navigate = useNavigate();
+  const [departure, setDeparture] = useState(null);
   const [arrival, setArrival] = useState(null);
-  const handleSearch = (event) => {
+  const [date, setDate] = useState('');
+  const [seats, setSeats] = useState(1);
+
+  const handleSubmit = (event) => {
     event.preventDefault();
+
+    const params = new URLSearchParams();
+    if (departure?.name) params.set('from', departure.name);
+    if (arrival?.name) params.set('to', arrival.name);
+    if (date) params.set('date', date);
+    if (seats) params.set('seats', String(seats));
+
+    navigate(`/search?${params.toString()}`);
   };
 
-
   return (
-    <StyledHome>
-      <form className="trip-search" onSubmit={handleSearch}>
-        <LocationInput
-           label="Lieu de départ"
-          onSelect={(place) => setDepart(place)}
-        />
-        <LocationInput
-          label="Lieu d'arrivée"
-          onSelect={(place) => setArrival(place)}
-        />
-        <button type="submit">Rechercher</button>
-      </form>
-    </StyledHome>
+    <form className="card shadow-sm p-3 p-md-4" onSubmit={handleSubmit}>
+      <div className="row g-3 align-items-end">
+        <div className="col-md-4">
+          <LocationAutocomplete label="Départ" value={departure?.name || ''} onSelect={setDeparture} />
+        </div>
+        <div className="col-md-4">
+          <LocationAutocomplete label="Arrivée" value={arrival?.name || ''} onSelect={setArrival} />
+        </div>
+        <div className="col-md-2">
+          <label className="form-label mb-1">Date</label>
+          <input className="form-control" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        </div>
+        <div className="col-md-1">
+          <label className="form-label mb-1">Places</label>
+          <input
+            className="form-control"
+            type="number"
+            min="1"
+            max="8"
+            value={seats}
+            onChange={(e) => setSeats(Number(e.target.value))}
+          />
+        </div>
+        <div className="col-md-1 d-grid">
+          <button type="submit" className="btn btn-dark">Rechercher</button>
+        </div>
+      </div>
+    </form>
   );
 }
 
-const StyledHome = styled.section`
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1px 16px 24px;
-
-  .trip-search {
-    width: min(900px, 100%);
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 12px;
-    background: #ffffff;
-    border: 1px solid rgba(15, 23, 42, 0.14);
-    border-radius: 14px;
-    padding: 14px;
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.1);
-  }
-
-  input {
-    height: 46px;
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    padding: 0 12px;
-    font-size: 15px;
-    outline: none;
-  }
-
-  input:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-  }
-
-  button {
-    height: 46px;
-    border: none;
-    border-radius: 10px;
-    padding: 0 18px;
-    background: #0f172a;
-    color: #ffffff;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  @media (max-width: 760px) {
-    .trip-search {
-      grid-template-columns: 1fr;
-    }
-  }
-`;
-
-export default TripSearch;
+export default TripSearchForm;

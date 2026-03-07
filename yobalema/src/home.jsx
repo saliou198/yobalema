@@ -1,11 +1,7 @@
-import TripSearch from './tripInputForm';
+import HomePage from './pages/HomePage';
 
 function Home() {
-  return (
-    <>
-      <TripSearch />
-    </>
-  );
+  return <HomePage />;
 }
 
 export default Home;

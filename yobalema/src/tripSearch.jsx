@@ -1,3 +1,5 @@
-import { useState } from "react";
+import TripSearchForm from './tripInputForm';
 
-import styled from 'styled-components';
+const TripSearch = () => <TripSearchForm />;
+
+export default TripSearch;
