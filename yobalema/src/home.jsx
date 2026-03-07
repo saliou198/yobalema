@@ -1,4 +1,4 @@
-import TripSearch from './tripSearch';
+import TripSearch from './tripInputForm';
 
 function Home() {
   return (

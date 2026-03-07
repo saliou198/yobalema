@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 const LocationInput = ({ label, onSelect }) => {
+
   const [query, setQuery] = useState("");         // ce que l'user tape
   const [suggestions, setSuggestions] = useState([]); // résultats de l'API
 
@@ -16,7 +17,7 @@ const LocationInput = ({ label, onSelect }) => {
       setSuggestions([]);
       return;
     }
-
+    
     try {
       const response = await fetch(
         `https://api.geoapify.com/v1/geocode/autocomplete?text=${value}&apiKey=${API_KEY}&lang=fr&limit=5`
@@ -26,7 +27,9 @@ const LocationInput = ({ label, onSelect }) => {
       // data.features contient le tableau des suggestions
       setSuggestions(data.features);
     } catch (error) {
+
       alert.error("Erreur Geoapify:", error);
+
     }
   };
 
