@@ -57,10 +57,7 @@ const LoginForm = () => {
 const StyledWrapper = styled.div`
 justify-content: center;
 display: flex;
-margin-top: 3
-
-
-0px;
+margin-top: 30px;
 
 
   .form {
